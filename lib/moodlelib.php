@@ -6163,6 +6163,11 @@ function email_to_user($user, $from, $subject, $messagetext, $messagehtml = '', 
         $mail->addReplyTo($values[0], $values[1]);
     }
 
+    $GLOBALS['MDL65194'] = [];
+	$mail->Debugoutput = function($debugOutputLine, $level) {
+        $GLOBALS['MDL65194'][] = $debugOutputLine;
+    };
+
     if ($mail->send()) {
         set_send_count($user);
         if (!empty($mail->SMTPDebug)) {
@@ -6178,7 +6183,8 @@ function email_to_user($user, $from, $subject, $messagetext, $messagehtml = '', 
             'other' => array(
                 'subject' => $subject,
                 'message' => $messagetext,
-                'errorinfo' => $mail->ErrorInfo
+                //MDL-65194 'errorinfo' => $mail->ErrorInfo
+                'errorinfo' => $mail->ErrorInfo . ' ' . implode("\n", $GLOBALS['MDL65194'])
             )
         ));
         $event->trigger();
